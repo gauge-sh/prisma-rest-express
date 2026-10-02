@@ -1,10 +1,16 @@
 import { Prisma, PrismaClient } from '@prisma/client'
 import express from 'express'
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient({ datasources: { db: { url: process.env.DATABASE_URL || 'file:./dev.db' } } })
 const app = express()
 
 app.use(express.json())
+app.use((_req, res, next) => { res.setHeader('X-Environment', process.env.APP_ENV || 'local'); next() })
+app.use((req, res, next) => {
+  if (!process.env.API_TOKEN) return res.status(503).json({error: 'Start with npm run dev:local or npm run dev:staging'})
+  if (req.headers.authorization !== `Bearer ${process.env.API_TOKEN}`) return res.status(401).json({error: 'Unauthorized'})
+  next()
+})
 
 app.post(`/signup`, async (req, res) => {
   const { name, email, posts } = req.body
@@ -145,7 +151,7 @@ app.get('/feed', async (req, res) => {
   res.json(posts)
 })
 
-const server = app.listen(3000, () =>
+const server = app.listen(Number(process.env.PORT || 3000), () =>
   console.log(`
 🚀 Server ready at: http://localhost:3000
 ⭐️ See sample requests: http://pris.ly/e/ts/rest-express#3-using-the-rest-api`),
