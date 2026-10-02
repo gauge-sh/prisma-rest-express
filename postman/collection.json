@@ -1,0 +1,371 @@
+{
+  "info": {
+    "name": "Blog API (rest-express)",
+    "description": "Requests for the Express + Prisma blog API at gauge-sh/prisma-rest-express. Start the server with `npm run dev` (port 3000) and run this collection against {{baseUrl}}. Run the Users folder before Posts: Sign up stores userEmail, Create post stores postId.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "postId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "userEmail",
+      "value": "alice@prisma.io",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "List users",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"body is JSON\", () => pm.response.to.be.json);",
+                  "pm.test(\"returns an array\", () => pm.expect(pm.response.json()).to.be.an(\"array\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users"
+              ]
+            },
+            "description": "Fetch all users."
+          }
+        },
+        {
+          "name": "Sign up",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"body is JSON\", () => pm.response.to.be.json);",
+                  "pm.test(\"returns the created user\", () => {",
+                  "  const u = pm.response.json();",
+                  "  pm.expect(u).to.have.property(\"id\");",
+                  "  pm.expect(u).to.have.property(\"email\");",
+                  "  pm.collectionVariables.set(\"userId\", u.id);",
+                  "  pm.collectionVariables.set(\"userEmail\", u.email);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/signup",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "signup"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Postman Tester\",\n  \"email\": \"postman-{{$randomInt}}@example.com\",\n  \"posts\": [\n    {\n      \"title\": \"Hello from Postman\",\n      \"content\": \"Created by the collection run\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Create a new user, optionally with initial posts."
+          }
+        },
+        {
+          "name": "User drafts",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"body is JSON\", () => pm.response.to.be.json);",
+                  "pm.test(\"returns an array\", () => pm.expect(pm.response.json()).to.be.an(\"array\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/user/{{userId}}/drafts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "{{userId}}",
+                "drafts"
+              ]
+            },
+            "description": "Fetch a user's unpublished posts."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Posts",
+      "item": [
+        {
+          "name": "Create post",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"body is JSON\", () => pm.response.to.be.json);",
+                  "pm.test(\"returns the created post\", () => {",
+                  "  const p = pm.response.json();",
+                  "  pm.expect(p).to.have.property(\"id\");",
+                  "  pm.expect(p.published).to.eql(false);",
+                  "  pm.collectionVariables.set(\"postId\", p.id);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/post",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "post"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"A post from the collection\",\n  \"content\": \"Body text\",\n  \"authorEmail\": \"{{userEmail}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Create a post for an existing user by email."
+          }
+        },
+        {
+          "name": "Get post",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"body is JSON\", () => pm.response.to.be.json);",
+                  "pm.test(\"post has a title\", () => pm.expect(pm.response.json()).to.have.property(\"title\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/post/{{postId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "post",
+                "{{postId}}"
+              ]
+            },
+            "description": "Fetch a single post by id."
+          }
+        },
+        {
+          "name": "Toggle publish",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"body is JSON\", () => pm.response.to.be.json);",
+                  "pm.test(\"published flag present\", () => pm.expect(pm.response.json()).to.have.property(\"published\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/publish/{{postId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "publish",
+                "{{postId}}"
+              ]
+            },
+            "description": "Toggle the published flag on a post."
+          }
+        },
+        {
+          "name": "Increment views",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"body is JSON\", () => pm.response.to.be.json);",
+                  "pm.test(\"viewCount present\", () => pm.expect(pm.response.json()).to.have.property(\"viewCount\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/post/{{postId}}/views",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "post",
+                "{{postId}}",
+                "views"
+              ]
+            },
+            "description": "Increment a post's view count by one."
+          }
+        },
+        {
+          "name": "Feed",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"body is JSON\", () => pm.response.to.be.json);",
+                  "pm.test(\"feed is an array of published posts\", () => {",
+                  "  const f = pm.response.json();",
+                  "  pm.expect(f).to.be.an(\"array\");",
+                  "  f.forEach((p) => pm.expect(p.published).to.eql(true));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/feed?take=5&orderBy=desc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "feed"
+              ],
+              "query": [
+                {
+                  "key": "take",
+                  "value": "5"
+                },
+                {
+                  "key": "orderBy",
+                  "value": "desc"
+                }
+              ]
+            },
+            "description": "Fetch published posts. Supports searchString, take, skip, orderBy (asc|desc)."
+          }
+        },
+        {
+          "name": "Delete post",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"body is JSON\", () => pm.response.to.be.json);",
+                  "pm.test(\"returns the deleted post\", () => pm.expect(pm.response.json()).to.have.property(\"id\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/post/{{postId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "post",
+                "{{postId}}"
+              ]
+            },
+            "description": "Delete a post by id."
+          }
+        }
+      ]
+    }
+  ]
+}
