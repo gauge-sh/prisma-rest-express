@@ -1,0 +1,1 @@
+export async function loadArticles(baseUrl) { const response = await fetch(`${baseUrl}/api/articles`); if (!response.ok) throw new Error(`API ${response.status}: ${await response.text()}`); return (await response.json()).articles; }

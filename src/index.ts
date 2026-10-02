@@ -5,6 +5,7 @@ const prisma = new PrismaClient()
 const app = express()
 
 app.use(express.json())
+app.get('/api/articles', (_req, res) => res.status(501).json({ error: 'Backend implementation pending' }))
 
 app.post(`/signup`, async (req, res) => {
   const { name, email, posts } = req.body
@@ -145,7 +146,7 @@ app.get('/feed', async (req, res) => {
   res.json(posts)
 })
 
-const server = app.listen(3000, () =>
+const server = app.listen(Number(process.env.PORT || 3000), () =>
   console.log(`
 🚀 Server ready at: http://localhost:3000
 ⭐️ See sample requests: http://pris.ly/e/ts/rest-express#3-using-the-rest-api`),
