@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "license": "MIT",
   "scripts": {
-    "dev": "ts-node src/index.ts"
+    "dev": "ts-node src/index.ts",
+    "setup": "prisma db push && prisma db seed",
+    "check": "tsc --noEmit"
   },
   "dependencies": {
     "@prisma/client": "4.9.0",
