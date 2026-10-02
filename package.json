@@ -3,7 +3,11 @@
   "version": "1.0.0",
   "license": "MIT",
   "scripts": {
-    "dev": "ts-node src/index.ts"
+    "dev": "node scripts/environment.mjs local",
+    "setup": "node scripts/environment.mjs setup",
+    "check": "tsc --noEmit",
+    "dev:local": "node scripts/environment.mjs local",
+    "dev:staging": "node scripts/environment.mjs staging"
   },
   "dependencies": {
     "@prisma/client": "4.9.0",
